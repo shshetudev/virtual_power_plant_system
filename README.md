@@ -29,3 +29,7 @@
 - refactor: code change that neither fixes a bug nor adds a feature
 - test: adding or correcting tests
 - chore: maintenance tasks
+
+## Wireframe
+- Swagger UI at: http://localhost:8080/swagger-ui.html
+- OpenAPI JSON at: http://localhost:8080/api-docs
