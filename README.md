@@ -34,6 +34,12 @@
 - Swagger UI at: http://localhost:8080/swagger-ui.html
 - OpenAPI JSON at: http://localhost:8080/api-docs
 
+## Added Logging support(`logback-spring.xml`)
+- Configures three logging destinations: console output, a general log file (virtual-power-grid.log), and a separate error-only log file (error.log)
+- Implements log rotation with 30-day retention policy and size caps (3GB for general logs, 1GB for error logs)
+- Sets specific logging levels: INFO for application code, WARN for Spring and Hibernate framework code
+- Uses a consistent timestamp format with thread name, log level, logger name, and message across all logging outputs
+- 
 ### Necessary commands:
 - Run the tests: `./gradlew test`
 - Run the tests and see the jacoco report: `./gradlew jacocoTestReport`

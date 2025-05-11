@@ -30,9 +30,23 @@ spring:
 server:
   port: 8080
 
+# Logging Configuration
 logging:
   level:
-    org.flywaydb: DEBUG
+    root: INFO
+    com.powerledger.io.virtual_power_grid_system: INFO
+    org.springframework.web: INFO
+    org.hibernate: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/virtual-power-grid.log
+    max-size: 10MB
+    max-history: 30
+  logback:
+    rollingpolicy:
+      file-name-pattern: logs/archived/virtual-power-grid.%d{yyyy-MM-dd}.%i.log
 
 # Add this under the existing configuration
 springdoc:
