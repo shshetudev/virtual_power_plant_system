@@ -8,4 +8,7 @@ import java.util.List;
 public interface BatteryService {
     void saveAll(List<BatteryRequestDto> batteryRequestDtos);
     BatteryRangeResponseDto getBatteriesByPostcodeRange(Integer from, Integer to);
+    BatteryRangeResponseDto getBatteriesByPostcodeRange(Integer from, Integer to,
+                                                        Long minWattCapacity,
+                                                        Long maxWattCapacity);
 }

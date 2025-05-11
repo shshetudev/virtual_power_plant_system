@@ -31,21 +31,36 @@ public class BatteryServiceImpl implements BatteryService {
     }
 
     @Override
-    public BatteryRangeResponseDto getBatteriesByPostcodeRange(Integer from, Integer to) {
-        LOG.info("Retrieving all batteries with postcode range: from={}, to={}", from, to);
-        validatePostcodeRange(from, to);
+    public BatteryRangeResponseDto getBatteriesByPostcodeRange(Integer from, Integer to,
+                                                               Long minWattCapacity,
+                                                               Long maxWattCapacity) {
+        LOG.info("Retrieving batteries with postcode range: from={}, to={}, minWatt={}, maxWatt={}",
+                from, to, minWattCapacity, maxWattCapacity);
+        validateWattCapacity(minWattCapacity, maxWattCapacity);
 
-        // todo: Consider using a range query in the repository for more efficient data retrieval
+        // todo: Consider using a range query in the repository for more efficient data retrieval, it's kept just to show the usages of steam api
         List<Battery> batteries = batteryRepository.findAll().stream()
                 .filter(b -> b.getPostcode() >= from && b.getPostcode() <= to)
-                .sorted(Comparator.comparing(Battery::getName)).toList();
+                .filter(b -> minWattCapacity == null || b.getWattCapacity() >= minWattCapacity)
+                .filter(b -> maxWattCapacity == null || b.getWattCapacity() <= maxWattCapacity)
+                .sorted(Comparator.comparing(Battery::getName))
+                .toList();
+
         LOG.debug("Retrieved {} batteries", batteries.size());
         List<String> names = batteries.stream().map(Battery::getName).toList();
         long total = batteries.stream().mapToLong(Battery::getWattCapacity).sum();
-        LOG.debug("Retrieved total capacity {} watt", total);
-        double average = batteries.isEmpty() ? 0.0 : batteries.stream().mapToLong(Battery::getWattCapacity).average().orElse(0.0);
-        LOG.debug("Retrieved average capacity {} watt", average);
+        double average = batteries.isEmpty() ? 0.0 : batteries.stream()
+                .mapToLong(Battery::getWattCapacity)
+                .average()
+                .orElse(0.0);
+
         return new BatteryRangeResponseDto(names, total, average);
+    }
+
+    @Override
+    public BatteryRangeResponseDto getBatteriesByPostcodeRange(Integer from, Integer to) {
+        validatePostcodeRange(from, to);
+        return getBatteriesByPostcodeRange(from, to, null, null);
     }
 
     private void validatePostcodeRange(Integer from, Integer to) {
@@ -54,6 +69,21 @@ public class BatteryServiceImpl implements BatteryService {
         }
         if (from > to) {
             throw new IllegalArgumentException(ResponseMessages.POSTCODE_RANGE_INVALID);
+        }
+    }
+
+    private void validateWattCapacity(Long minWattCapacity, Long maxWattCapacity) {
+        if (minWattCapacity == null && maxWattCapacity == null) {
+            return;
+        }
+
+        if ((minWattCapacity != null && minWattCapacity < 0) ||
+                (maxWattCapacity != null && maxWattCapacity < 0)) {
+            throw new IllegalArgumentException(ResponseMessages.WATT_CAPACITY_MUST_BE_POSITIVE);
+        }
+
+        if ((minWattCapacity != null && maxWattCapacity != null) && (minWattCapacity > maxWattCapacity)) {
+            throw new IllegalArgumentException(ResponseMessages.WATT_CAPACITY_RANGE_INVALID);
         }
     }
 }

@@ -21,6 +21,8 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -170,10 +172,15 @@ class BatteryControllerTest {
                             .param("to", "2000"))
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(jsonPath("$.status").value(200))
+                    .andExpect(jsonPath("$.message").value(ResponseMessages.BATTERIES_RETRIEVED_SUCCESS))
+                    .andExpect(jsonPath("$.data").exists())
                     .andExpect(jsonPath("$.data.batteryNames").isArray())
                     .andExpect(jsonPath("$.data.batteryNames").isEmpty())
                     .andExpect(jsonPath("$.data.totalWattCapacity").value(0))
                     .andExpect(jsonPath("$.data.averageWattCapacity").value(0.0));
+
+            verify(batteryService).getBatteriesByPostcodeRange(1000, 2000);
         }
 
         @Test
@@ -190,6 +197,129 @@ class BatteryControllerTest {
                     .andExpect(jsonPath("$.error").value(ResponseMessages.INVALID_ARGUMENT));
 
             verify(batteryService).getBatteriesByPostcodeRange(2000, 1000);
+        }
+    }
+
+    @Nested
+    @DisplayName("Get Batteries With Watt Capacity Filters Tests")
+    class GetBatteriesWithWattCapacityFiltersTests {
+
+        @Test
+        @DisplayName("Should filter batteries by minimum watt capacity")
+        void getBatteriesByPostcodeRange_shouldFilterByMinWattCapacity() throws Exception {
+            BatteryRangeResponseDto responseDto = new BatteryRangeResponseDto(
+                    Arrays.asList("HighWatt", "MidWatt"),
+                    500L,
+                    250.0
+            );
+
+            when(batteryService.getBatteriesByPostcodeRange(anyInt(), anyInt(), eq(200L), isNull()))
+                    .thenReturn(responseDto);
+
+            mockMvc.perform(get(BASE_PATH + "/range")
+                            .param("from", "1000")
+                            .param("to", "2000")
+                            .param("minWattCapacity", "200"))
+                    .andExpect(status().isOk())
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(jsonPath("$.status").value(200))
+                    .andExpect(jsonPath("$.message").value(ResponseMessages.BATTERIES_RETRIEVED_SUCCESS))
+                    .andExpect(jsonPath("$.data.batteryNames").isArray())
+                    .andExpect(jsonPath("$.data.batteryNames[0]").value("HighWatt"))
+                    .andExpect(jsonPath("$.data.batteryNames[1]").value("MidWatt"))
+                    .andExpect(jsonPath("$.data.totalWattCapacity").value(500))
+                    .andExpect(jsonPath("$.data.averageWattCapacity").value(250.0));
+
+            verify(batteryService).getBatteriesByPostcodeRange(1000, 2000, 200L, null);
+        }
+
+        @Test
+        @DisplayName("Should filter batteries by maximum watt capacity")
+        void getBatteriesByPostcodeRange_shouldFilterByMaxWattCapacity() throws Exception {
+            BatteryRangeResponseDto responseDto = new BatteryRangeResponseDto(
+                    Arrays.asList("LowWatt", "MidWatt"),
+                    300L,
+                    150.0
+            );
+
+            when(batteryService.getBatteriesByPostcodeRange(anyInt(), anyInt(), isNull(), eq(200L)))
+                    .thenReturn(responseDto);
+
+            mockMvc.perform(get(BASE_PATH + "/range")
+                            .param("from", "1000")
+                            .param("to", "2000")
+                            .param("maxWattCapacity", "200"))
+                    .andExpect(status().isOk())
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(jsonPath("$.data.batteryNames[0]").value("LowWatt"))
+                    .andExpect(jsonPath("$.data.batteryNames[1]").value("MidWatt"))
+                    .andExpect(jsonPath("$.data.totalWattCapacity").value(300))
+                    .andExpect(jsonPath("$.data.averageWattCapacity").value(150.0));
+
+            verify(batteryService).getBatteriesByPostcodeRange(1000, 2000, null, 200L);
+        }
+
+        @Test
+        @DisplayName("Should filter batteries by both min and max watt capacity")
+        void getBatteriesByPostcodeRange_shouldFilterByMinAndMaxWattCapacity() throws Exception {
+            BatteryRangeResponseDto responseDto = new BatteryRangeResponseDto(
+                    List.of("MidWatt"),
+                    200L,
+                    200.0
+            );
+
+            when(batteryService.getBatteriesByPostcodeRange(anyInt(), anyInt(), eq(150L), eq(250L)))
+                    .thenReturn(responseDto);
+
+            mockMvc.perform(get(BASE_PATH + "/range")
+                            .param("from", "1000")
+                            .param("to", "2000")
+                            .param("minWattCapacity", "150")
+                            .param("maxWattCapacity", "250"))
+                    .andExpect(status().isOk())
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(jsonPath("$.data.batteryNames").isArray())
+                    .andExpect(jsonPath("$.data.batteryNames.length()").value(1))
+                    .andExpect(jsonPath("$.data.batteryNames[0]").value("MidWatt"))
+                    .andExpect(jsonPath("$.data.totalWattCapacity").value(200))
+                    .andExpect(jsonPath("$.data.averageWattCapacity").value(200.0));
+
+            verify(batteryService).getBatteriesByPostcodeRange(1000, 2000, 150L, 250L);
+        }
+
+        @Test
+        @DisplayName("Should handle invalid watt capacity range")
+        void getBatteriesByPostcodeRange_shouldHandleInvalidWattCapacityRange() throws Exception {
+            when(batteryService.getBatteriesByPostcodeRange(anyInt(), anyInt(), eq(300L), eq(200L)))
+                    .thenThrow(new IllegalArgumentException(ResponseMessages.WATT_CAPACITY_RANGE_INVALID));
+
+            mockMvc.perform(get(BASE_PATH + "/range")
+                            .param("from", "1000")
+                            .param("to", "2000")
+                            .param("minWattCapacity", "300")
+                            .param("maxWattCapacity", "200"))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.status").value(400))
+                    .andExpect(jsonPath("$.error").value(ResponseMessages.INVALID_ARGUMENT));
+
+            verify(batteryService).getBatteriesByPostcodeRange(1000, 2000, 300L, 200L);
+        }
+
+        @Test
+        @DisplayName("Should handle negative watt capacity values")
+        void getBatteriesByPostcodeRange_shouldHandleNegativeWattCapacity() throws Exception {
+            when(batteryService.getBatteriesByPostcodeRange(anyInt(), anyInt(), eq(-100L), isNull()))
+                    .thenThrow(new IllegalArgumentException(ResponseMessages.WATT_CAPACITY_MUST_BE_POSITIVE));
+
+            mockMvc.perform(get(BASE_PATH + "/range")
+                            .param("from", "1000")
+                            .param("to", "2000")
+                            .param("minWattCapacity", "-100"))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.status").value(400))
+                    .andExpect(jsonPath("$.error").value(ResponseMessages.INVALID_ARGUMENT));
+
+            verify(batteryService).getBatteriesByPostcodeRange(1000, 2000, -100L, null);
         }
     }
 }

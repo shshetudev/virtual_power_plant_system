@@ -31,14 +31,21 @@ public class BatteryController {
     }
 
     @GetMapping("/range")
-    @Operation(summary = "Get batteries by postcode range", description = "Returns battery names (sorted) and statistics for a postcode range")
+    @Operation(summary = "Get batteries by postcode range",
+            description = "Returns battery names (sorted) and statistics for a postcode range with optional watt capacity filters")
     @ApiResponse(responseCode = "200", description = "Batteries and statistics retrieved successfully")
     @ApiResponse(responseCode = "400", description = "Invalid or missing parameters")
     public ResponseEntity<Response<BatteryRangeResponseDto>> getBatteriesByPostcodeRange(
             @RequestParam @NotNull Integer from,
-            @RequestParam @NotNull Integer to) {
-        LOG.info("Received request for batteries in postcode range: {}-{}", from, to);
-        BatteryRangeResponseDto response = batteryService.getBatteriesByPostcodeRange(from, to);
+            @RequestParam @NotNull Integer to,
+            @RequestParam(required = false) Long minWattCapacity,
+            @RequestParam(required = false) Long maxWattCapacity) {
+        LOG.info("Received request for batteries in postcode range: {}-{} with watt capacity filters - min: {}, max: {}",
+                from, to, minWattCapacity, maxWattCapacity);
+        BatteryRangeResponseDto response =
+                (minWattCapacity != null || maxWattCapacity != null)
+                        ? batteryService.getBatteriesByPostcodeRange(from, to, minWattCapacity, maxWattCapacity)
+                        : batteryService.getBatteriesByPostcodeRange(from, to);
         return ResponseEntity.ok(Response.success(
                 HttpStatus.OK.value(),
                 ResponseMessages.BATTERIES_RETRIEVED_SUCCESS,
