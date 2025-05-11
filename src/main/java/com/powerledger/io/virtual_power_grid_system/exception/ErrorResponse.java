@@ -1,4 +1,4 @@
-package com.powerledger.io.virtual_power_grid_system.battery.exception;
+package com.powerledger.io.virtual_power_grid_system.exception;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;

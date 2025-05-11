@@ -1,4 +1,4 @@
-package com.powerledger.io.virtual_power_grid_system.battery.exception;
+package com.powerledger.io.virtual_power_grid_system.exception;
 
 import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
