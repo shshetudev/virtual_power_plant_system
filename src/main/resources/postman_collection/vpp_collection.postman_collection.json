@@ -1,0 +1,707 @@
+{
+	"info": {
+		"_postman_id": "678d9df7-a7be-4a12-83f1-7276e317297e",
+		"name": "vpp_collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "40783722",
+		"_collection_link": "https://gd0000-2058.postman.co/workspace/Team-Workspace~41586a10-39ee-4ac2-86b9-da8592ca2023/collection/40783722-678d9df7-a7be-4a12-83f1-7276e317297e?action=share&source=collection_link&creator=40783722"
+	},
+	"item": [
+		{
+			"name": "R1: Basic valid request",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/batteries/range?from=1000&to=2000",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"batteries",
+						"range"
+					],
+					"query": [
+						{
+							"key": "from",
+							"value": "1000"
+						},
+						{
+							"key": "to",
+							"value": "2000"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "R2.1: Missing`from` parameter",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/batteries/range?to=2000",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"batteries",
+						"range"
+					],
+					"query": [
+						{
+							"key": "to",
+							"value": "2000"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "R2.2: Missing `to` parameter",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/batteries/range?from=1000",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"batteries",
+						"range"
+					],
+					"query": [
+						{
+							"key": "from",
+							"value": "1000"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "R2.3: Missing both `from` and `to` parameter",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/batteries/range",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"batteries",
+						"range"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "R3.1: Min Watt Capacity Only",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/batteries/range?from=1000&to=2000&minWattCapacity=200",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"batteries",
+						"range"
+					],
+					"query": [
+						{
+							"key": "from",
+							"value": "1000"
+						},
+						{
+							"key": "to",
+							"value": "2000"
+						},
+						{
+							"key": "minWattCapacity",
+							"value": "200"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "R3.2: Max Watt Capacity Only",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/batteries/range?from=1000&to=2000&maxWattCapacity=200",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"batteries",
+						"range"
+					],
+					"query": [
+						{
+							"key": "from",
+							"value": "1000"
+						},
+						{
+							"key": "to",
+							"value": "2000"
+						},
+						{
+							"key": "maxWattCapacity",
+							"value": "200"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "R3.3: Both Min and Max Watt Capacity",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/batteries/range?from=1000&to=2000&minWattCapacity=100&maxWattCapacity=300",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"batteries",
+						"range"
+					],
+					"query": [
+						{
+							"key": "from",
+							"value": "1000"
+						},
+						{
+							"key": "to",
+							"value": "2000"
+						},
+						{
+							"key": "minWattCapacity",
+							"value": "100"
+						},
+						{
+							"key": "maxWattCapacity",
+							"value": "300"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "R3.4: Invalid Watt Capacity Range (min > max)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/batteries/range?from=1000&to=2000&minWattCapacity=300&maxWattCapacity=100",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"batteries",
+						"range"
+					],
+					"query": [
+						{
+							"key": "from",
+							"value": "1000"
+						},
+						{
+							"key": "to",
+							"value": "2000"
+						},
+						{
+							"key": "minWattCapacity",
+							"value": "300"
+						},
+						{
+							"key": "maxWattCapacity",
+							"value": "100"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "R3.5: Negative min watt capacity",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/batteries/range?from=1000&to=2000&minWattCapacity=-100",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"batteries",
+						"range"
+					],
+					"query": [
+						{
+							"key": "from",
+							"value": "1000"
+						},
+						{
+							"key": "to",
+							"value": "2000"
+						},
+						{
+							"key": "minWattCapacity",
+							"value": "-100"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "R3.6: Negative max watt capacity",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/batteries/range?from=1000&to=2000&maxWattCapacity=-100",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"batteries",
+						"range"
+					],
+					"query": [
+						{
+							"key": "from",
+							"value": "1000"
+						},
+						{
+							"key": "to",
+							"value": "2000"
+						},
+						{
+							"key": "maxWattCapacity",
+							"value": "-100"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "R3.7: Non-numeric postcode",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/batteries/range?to=2000&from=abc",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"batteries",
+						"range"
+					],
+					"query": [
+						{
+							"key": "to",
+							"value": "2000"
+						},
+						{
+							"key": "from",
+							"value": "abc"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "R3.8: Non-numeric watt capacity",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/batteries/range?from=1000&to=2000&minWattCapacity=abc",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"batteries",
+						"range"
+					],
+					"query": [
+						{
+							"key": "from",
+							"value": "1000"
+						},
+						{
+							"key": "to",
+							"value": "2000"
+						},
+						{
+							"key": "minWattCapacity",
+							"value": "abc"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "R3.9: Zero postcode",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/batteries/range?to=2000&from=0",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"batteries",
+						"range"
+					],
+					"query": [
+						{
+							"key": "to",
+							"value": "2000"
+						},
+						{
+							"key": "from",
+							"value": "0"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "R3.10: Zero watt capacity",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/batteries/range?from=1000&to=2000&minWattCapacity=0",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"batteries",
+						"range"
+					],
+					"query": [
+						{
+							"key": "from",
+							"value": "1000"
+						},
+						{
+							"key": "to",
+							"value": "2000"
+						},
+						{
+							"key": "minWattCapacity",
+							"value": "0"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "R3.11: Very large postcode",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/batteries/range?from=1000&to=9999999",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"batteries",
+						"range"
+					],
+					"query": [
+						{
+							"key": "from",
+							"value": "1000"
+						},
+						{
+							"key": "to",
+							"value": "9999999"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "R3.12: Very large watt capacity",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/batteries/range?from=1000&to=2000&minWattCapacity=9999999999",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"batteries",
+						"range"
+					],
+					"query": [
+						{
+							"key": "from",
+							"value": "1000"
+						},
+						{
+							"key": "to",
+							"value": "2000"
+						},
+						{
+							"key": "minWattCapacity",
+							"value": "9999999999"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "R3.13: Range with likely no results",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/batteries/range?from=9998&to=9999",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"batteries",
+						"range"
+					],
+					"query": [
+						{
+							"key": "from",
+							"value": "9998"
+						},
+						{
+							"key": "to",
+							"value": "9999"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "R3.13: Watt capacity with likely no results",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/batteries/range?from=1000&to=2000&minWattCapacity=99999",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"batteries",
+						"range"
+					],
+					"query": [
+						{
+							"key": "from",
+							"value": "1000"
+						},
+						{
+							"key": "to",
+							"value": "2000"
+						},
+						{
+							"key": "minWattCapacity",
+							"value": "99999"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
