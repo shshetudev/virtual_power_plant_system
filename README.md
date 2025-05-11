@@ -30,6 +30,13 @@
 - test: adding or correcting tests
 - chore: maintenance tasks
 
-## Wireframe
+### Wireframe
 - Swagger UI at: http://localhost:8080/swagger-ui.html
 - OpenAPI JSON at: http://localhost:8080/api-docs
+
+### Necessary commands:
+- Run the tests: `./gradlew test`
+- Run the tests and see the jacoco report: `./gradlew jacocoTestReport`
+- See the Jacoco report in UI: `http://localhost:63342/virtual_power_grid_system/build/reports/jacoco/test/html/index.html`
+- Build the project: `./gradlew clean build`
+- Run the application: `./gradlew clean build && ./gradlew bootRun`
