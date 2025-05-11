@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.powerledger.io.virtual_power_grid_system.battery.controller.BatteryController;
 import com.powerledger.io.virtual_power_grid_system.battery.dto.BatteryRangeResponseDto;
 import com.powerledger.io.virtual_power_grid_system.battery.dto.BatteryRequestDto;
+import com.powerledger.io.virtual_power_grid_system.battery.queue.BatteryRegistrationProducer;
 import com.powerledger.io.virtual_power_grid_system.battery.service.BatteryService;
 import com.powerledger.io.virtual_power_grid_system.common.constants.ResponseMessages;
 import org.junit.jupiter.api.DisplayName;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -44,6 +46,9 @@ class BatteryControllerTest {
     @MockitoBean
     private BatteryService batteryService;
 
+    @MockitoBean
+    private BatteryRegistrationProducer batteryRegistrationProducer;
+
     @Nested
     @DisplayName("Save Batteries Endpoint Tests")
     class SaveBatteriesTests {
@@ -59,12 +64,10 @@ class BatteryControllerTest {
             mockMvc.perform(post(BASE_PATH)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(batteryRequests)))
-                    .andExpect(status().isCreated())
-                    .andExpect(jsonPath("$.status").value(201))
-                    .andExpect(jsonPath("$.message").value(ResponseMessages.BATTERIES_CREATED_SUCCESS))
+                    .andExpect(status().isAccepted())
+                    .andExpect(jsonPath("$.status").value(202))
+                    .andExpect(jsonPath("$.message").value(ResponseMessages.BATTERIES_REGISTRATION_REQUEST_ACCEPTED))
                     .andExpect(jsonPath("$.data").isEmpty());
-
-            verify(batteryService).saveAll(anyList());
         }
 
         @Test
@@ -93,11 +96,9 @@ class BatteryControllerTest {
             mockMvc.perform(post(BASE_PATH)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(emptyList)))
-                    .andExpect(status().isCreated())
-                    .andExpect(jsonPath("$.status").value(201))
-                    .andExpect(jsonPath("$.message").value(ResponseMessages.BATTERIES_CREATED_SUCCESS));
-
-            verify(batteryService).saveAll(emptyList);
+                    .andExpect(status().isAccepted())
+                    .andExpect(jsonPath("$.status").value(202))
+                    .andExpect(jsonPath("$.message").value(ResponseMessages.BATTERIES_REGISTRATION_REQUEST_ACCEPTED));
         }
 
         @Test

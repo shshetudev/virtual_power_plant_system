@@ -15,6 +15,12 @@ public class Battery {
     private Integer postcode;
     private Long wattCapacity;
 
+    private Battery(Builder builder) {
+        this.name = builder.name;
+        this.postcode = builder.postcode;
+        this.wattCapacity = builder.wattCapacity;
+    }
+
     public Battery() {
     }
 
@@ -24,6 +30,37 @@ public class Battery {
         this.wattCapacity = wattCapacity;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    // Builder
+    public static class Builder {
+        private String name;
+        private Integer postcode;
+        private Long wattCapacity;
+
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder postcode(Integer postcode) {
+            this.postcode = postcode;
+            return this;
+        }
+
+        public Builder wattCapacity(Long wattCapacity) {
+            this.wattCapacity = wattCapacity;
+            return this;
+        }
+
+        public Battery build() {
+            return new Battery(this);
+        }
+    }
+
+    // Getters and setters
     public Long getId() {
         return id;
     }

@@ -2,6 +2,7 @@ package com.powerledger.io.virtual_power_grid_system.battery.controller;
 
 import com.powerledger.io.virtual_power_grid_system.battery.dto.BatteryRangeResponseDto;
 import com.powerledger.io.virtual_power_grid_system.battery.dto.BatteryRequestDto;
+import com.powerledger.io.virtual_power_grid_system.battery.queue.BatteryRegistrationProducer;
 import com.powerledger.io.virtual_power_grid_system.battery.service.BatteryService;
 import com.powerledger.io.virtual_power_grid_system.common.constants.ResponseMessages;
 import com.powerledger.io.virtual_power_grid_system.common.dto.Response;
@@ -25,10 +26,13 @@ public class BatteryController {
 
     private static final Logger LOG = LoggerFactory.getLogger(BatteryController.class);
     private final BatteryService batteryService;
+    private final BatteryRegistrationProducer batteryRegistrationProducer;
 
-    public BatteryController(BatteryService batteryService) {
+    public BatteryController(BatteryService batteryService, BatteryRegistrationProducer batteryRegistrationProducer) {
         this.batteryService = batteryService;
+        this.batteryRegistrationProducer = batteryRegistrationProducer;
     }
+
 
     @GetMapping("/range")
     @Operation(summary = "Get batteries by postcode range",
@@ -53,15 +57,17 @@ public class BatteryController {
     }
 
     @PostMapping
-    @Operation(summary = "Save multiple batteries", description = "Add a list of batteries to the system")
-    @ApiResponse(responseCode = "201", description = "Batteries successfully created")
+    @Operation(summary = "Save multiple batteries", description = "Add a list of batteries to the system using async processing")
+    @ApiResponse(responseCode = "202", description = "Battery registration request accepted for processing")
     public ResponseEntity<Response<Void>> saveBatteries(@Valid @RequestBody List<BatteryRequestDto> batteryRequests) {
-        LOG.info("Received request to save {} batteries", batteryRequests.size());
-        batteryService.saveAll(batteryRequests);
-        return ResponseEntity.status(HttpStatus.CREATED).body(
+        LOG.info("Received request to register {} batteries", batteryRequests.size());
+
+        batteryRegistrationProducer.enqueueBatteryRegistrations(batteryRequests);
+
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(
                 Response.success(
-                        HttpStatus.CREATED.value(),
-                        ResponseMessages.BATTERIES_CREATED_SUCCESS,
+                        HttpStatus.ACCEPTED.value(),
+                        ResponseMessages.BATTERIES_REGISTRATION_REQUEST_ACCEPTED,
                         null));
     }
 }
