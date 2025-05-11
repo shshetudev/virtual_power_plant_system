@@ -4,6 +4,7 @@ import com.powerledger.io.virtual_power_grid_system.battery.dto.BatteryRangeResp
 import com.powerledger.io.virtual_power_grid_system.battery.model.Battery;
 import com.powerledger.io.virtual_power_grid_system.battery.dto.BatteryRequestDto;
 import com.powerledger.io.virtual_power_grid_system.battery.repository.BatteryRepository;
+import com.powerledger.io.virtual_power_grid_system.common.constants.ResponseMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,8 @@ public class BatteryServiceImpl implements BatteryService {
     @Override
     public BatteryRangeResponseDto getBatteriesByPostcodeRange(Integer from, Integer to) {
         LOG.info("Retrieving all batteries with postcode range: from={}, to={}", from, to);
+        validatePostcodeRange(from, to);
+
         // todo: Consider using a range query in the repository for more efficient data retrieval
         List<Battery> batteries = batteryRepository.findAll().stream()
                 .filter(b -> b.getPostcode() >= from && b.getPostcode() <= to)
@@ -44,5 +47,14 @@ public class BatteryServiceImpl implements BatteryService {
         double average = batteries.isEmpty() ? 0.0 : batteries.stream().mapToLong(Battery::getWattCapacity).average().orElse(0.0);
         LOG.debug("Retrieved average capacity {} watt", average);
         return new BatteryRangeResponseDto(names, total, average);
+    }
+
+    private void validatePostcodeRange(Integer from, Integer to) {
+        if (from < 0 || to < 0) {
+            throw new IllegalArgumentException(ResponseMessages.POSTCODE_MUST_BE_POSITIVE);
+        }
+        if (from > to) {
+            throw new IllegalArgumentException(ResponseMessages.POSTCODE_RANGE_INVALID);
+        }
     }
 }
