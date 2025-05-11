@@ -5,6 +5,7 @@ import com.powerledger.io.virtual_power_grid_system.battery.dto.BatteryRequestDt
 import com.powerledger.io.virtual_power_grid_system.battery.model.Battery;
 import com.powerledger.io.virtual_power_grid_system.battery.repository.BatteryRepository;
 import com.powerledger.io.virtual_power_grid_system.battery.service.BatteryServiceImpl;
+import com.powerledger.io.virtual_power_grid_system.common.constants.ResponseMessages;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -108,6 +109,96 @@ class BatteryServiceTest {
         BatteryRangeResponseDto result = batteryService.getBatteriesByPostcodeRange(1000, 2000);
 
         assertEquals(List.of("ABattery", "MBattery", "ZBattery"), result.getBatteryNames());
+        verify(batteryRepository).findAll();
+    }
+
+    @Test
+    void validatePostcodeRange_shouldThrowExceptionWhenFromIsNegative() {
+        // Arrange
+        Integer from = -1;
+        Integer to = 2000;
+
+        // Act & Assert
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> batteryService.getBatteriesByPostcodeRange(from, to));
+        assertEquals(ResponseMessages.POSTCODE_MUST_BE_POSITIVE, exception.getMessage());
+        verify(batteryRepository, never()).findAll();
+    }
+
+    @Test
+    void validatePostcodeRange_shouldThrowExceptionWhenToIsNegative() {
+        Integer from = 1000;
+        Integer to = -1;
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> batteryService.getBatteriesByPostcodeRange(from, to));
+        assertEquals(ResponseMessages.POSTCODE_MUST_BE_POSITIVE, exception.getMessage());
+        verify(batteryRepository, never()).findAll();
+    }
+
+    @Test
+    void validatePostcodeRange_shouldThrowExceptionWhenFromIsGreaterThanTo() {
+        Integer from = 2000;
+        Integer to = 1000;
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> batteryService.getBatteriesByPostcodeRange(from, to));
+        assertEquals(ResponseMessages.POSTCODE_RANGE_INVALID, exception.getMessage());
+        verify(batteryRepository, never()).findAll();
+    }
+
+    @Test
+    void validatePostcodeRange_shouldAcceptValidRange() {
+        Integer from = 1000;
+        Integer to = 2000;
+        when(batteryRepository.findAll()).thenReturn(Collections.emptyList());
+
+        BatteryRangeResponseDto result = batteryService.getBatteriesByPostcodeRange(from, to);
+
+        assertNotNull(result);
+        verify(batteryRepository).findAll();
+    }
+
+    @Test
+    void validatePostcodeRange_shouldAcceptEqualFromAndTo() {
+        Integer from = 1000;
+        Integer to = 1000;
+        List<Battery> batteries = List.of(new Battery("Battery1", 1000, 100L));
+        when(batteryRepository.findAll()).thenReturn(batteries);
+
+        BatteryRangeResponseDto result = batteryService.getBatteriesByPostcodeRange(from, to);
+
+        assertEquals(1, result.getBatteryNames().size());
+        assertEquals("Battery1", result.getBatteryNames().get(0));
+        verify(batteryRepository).findAll();
+    }
+
+    @Test
+    void getBatteriesByPostcodeRange_shouldCorrectlyFilterBatteriesOnBoundaries() {
+        Integer from = 1000;
+        Integer to = 2000;
+
+        List<Battery> allBatteries = Arrays.asList(
+                new Battery("BatteryBelow", 999, 100L),      // Just below lower boundary
+                new Battery("BatteryLower", 1000, 150L),     // Exactly at lower boundary
+                new Battery("BatteryMiddle", 1500, 200L),    // In the middle of range
+                new Battery("BatteryUpper", 2000, 250L),     // Exactly at upper boundary
+                new Battery("BatteryAbove", 2001, 300L)      // Just above upper boundary
+        );
+
+        when(batteryRepository.findAll()).thenReturn(allBatteries);
+
+        BatteryRangeResponseDto result = batteryService.getBatteriesByPostcodeRange(from, to);
+
+        assertEquals(3, result.getBatteryNames().size());
+        assertTrue(result.getBatteryNames().contains("BatteryLower"));
+        assertTrue(result.getBatteryNames().contains("BatteryMiddle"));
+        assertTrue(result.getBatteryNames().contains("BatteryUpper"));
+        assertFalse(result.getBatteryNames().contains("BatteryBelow"));
+        assertFalse(result.getBatteryNames().contains("BatteryAbove"));
+
+        assertEquals(600L, result.getTotalWattCapacity());
+        assertEquals(200.0, result.getAverageWattCapacity());
         verify(batteryRepository).findAll();
     }
 }
