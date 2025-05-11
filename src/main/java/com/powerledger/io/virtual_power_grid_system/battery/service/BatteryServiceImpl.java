@@ -34,7 +34,9 @@ public class BatteryServiceImpl implements BatteryService {
     public BatteryRangeResponseDto getBatteriesByPostcodeRange(Integer from, Integer to) {
         LOG.info("Retrieving all batteries with postcode range: from={}, to={}", from, to);
         // todo: Consider using a range query in the repository for more efficient data retrieval
-        List<Battery> batteries = batteryRepository.findAll().stream().filter(b -> b.getPostcode() >= from && b.getPostcode() <= to).sorted(Comparator.comparing(Battery::getName)).toList();
+        List<Battery> batteries = batteryRepository.findAll().stream()
+                .filter(b -> b.getPostcode() >= from && b.getPostcode() <= to)
+                .sorted(Comparator.comparing(Battery::getName)).toList();
         LOG.debug("Retrieved {} batteries", batteries.size());
         List<String> names = batteries.stream().map(Battery::getName).toList();
         long total = batteries.stream().mapToLong(Battery::getWattCapacity).sum();
