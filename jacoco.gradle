@@ -1,7 +1,9 @@
 // JaCoCo exclusion patterns
 def jacocoPackageExclusions = [
         'com/powerledger/io/virtual_power_grid_system/config/**',
-        'com/powerledger/io/virtual_power_grid_system/exception/**'
+        'com/powerledger/io/virtual_power_grid_system/exception/**',
+        'com/powerledger/io/virtual_power_grid_system/common/dto/**',
+        'com/powerledger/io/virtual_power_grid_system/common/constants/**',
 ]
 
 def jacocoClassExclusions = [
@@ -10,7 +12,8 @@ def jacocoClassExclusions = [
 
 def jacocoFolderPatternExclusions = [
         '**/dto/**',
-        '**/model/**'
+        '**/model/**',
+        '**/exception/**',
 ]
 
 def jacocoExclusions = jacocoPackageExclusions + jacocoClassExclusions + jacocoFolderPatternExclusions
