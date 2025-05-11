@@ -5,7 +5,6 @@ import com.powerledger.io.virtual_power_grid_system.battery.dto.BatteryRequestDt
 import com.powerledger.io.virtual_power_grid_system.battery.model.Battery;
 import com.powerledger.io.virtual_power_grid_system.battery.repository.BatteryRepository;
 import com.powerledger.io.virtual_power_grid_system.battery.service.BatteryServiceImpl;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,7 +20,7 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class BatteryServiceImplTest {
+class BatteryServiceTest {
 
     @Mock
     private BatteryRepository batteryRepository;
