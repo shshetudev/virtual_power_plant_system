@@ -3,10 +3,13 @@ package com.powerledger.io.virtual_power_grid_system.battery.controller;
 import com.powerledger.io.virtual_power_grid_system.battery.dto.BatteryRangeResponseDto;
 import com.powerledger.io.virtual_power_grid_system.battery.dto.BatteryRequestDto;
 import com.powerledger.io.virtual_power_grid_system.battery.service.BatteryService;
+import com.powerledger.io.virtual_power_grid_system.common.constants.ResponseMessages;
+import com.powerledger.io.virtual_power_grid_system.common.dto.Response;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -27,23 +30,31 @@ public class BatteryController {
         this.batteryService = batteryService;
     }
 
-    @PostMapping
-    @Operation(summary = "Save multiple batteries", description = "Add a list of batteries to the system")
-    @ApiResponse(responseCode = "201", description = "Batteries successfully created")
-    public ResponseEntity<Void> saveBatteries(@Valid @RequestBody List<BatteryRequestDto> batteryRequests) {
-        LOG.info("Received request to save {} batteries", batteryRequests.size());
-        batteryService.saveAll(batteryRequests);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
-    }
-
     @GetMapping("/range")
     @Operation(summary = "Get batteries by postcode range", description = "Returns battery names (sorted) and statistics for a postcode range")
     @ApiResponse(responseCode = "200", description = "Batteries and statistics retrieved successfully")
-    public ResponseEntity<BatteryRangeResponseDto> getBatteriesByPostcodeRange(
-            @RequestParam int from,
-            @RequestParam int to) {
+    @ApiResponse(responseCode = "400", description = "Invalid or missing parameters")
+    public ResponseEntity<Response<BatteryRangeResponseDto>> getBatteriesByPostcodeRange(
+            @RequestParam @NotNull Integer from,
+            @RequestParam @NotNull Integer to) {
         LOG.info("Received request for batteries in postcode range: {}-{}", from, to);
         BatteryRangeResponseDto response = batteryService.getBatteriesByPostcodeRange(from, to);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(Response.success(
+                HttpStatus.OK.value(),
+                ResponseMessages.BATTERIES_RETRIEVED_SUCCESS,
+                response));
+    }
+
+    @PostMapping
+    @Operation(summary = "Save multiple batteries", description = "Add a list of batteries to the system")
+    @ApiResponse(responseCode = "201", description = "Batteries successfully created")
+    public ResponseEntity<Response<Void>> saveBatteries(@Valid @RequestBody List<BatteryRequestDto> batteryRequests) {
+        LOG.info("Received request to save {} batteries", batteryRequests.size());
+        batteryService.saveAll(batteryRequests);
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                Response.success(
+                        HttpStatus.CREATED.value(),
+                        ResponseMessages.BATTERIES_CREATED_SUCCESS,
+                        null));
     }
 }
