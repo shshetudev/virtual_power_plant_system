@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import java.util.Comparator;
 import java.util.List;
 
-// todo: Introduce mapper
 @Service
 public class BatteryServiceImpl implements BatteryService {
 
