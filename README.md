@@ -137,6 +137,7 @@ virtual_power_grid_system
 - Gradle
 - PostgreSQL (via Testcontainers for integration tests)
 - Redis (via Testcontainers for integration tests)
+- Flyway
 - REST API
 - Jacoco: Ensured the build will never pass if test coverage is below 70%
 - Logback
